@@ -32,6 +32,8 @@ export default class UserManager {
     })
     // whenever a user join we need to add them to the queue
     this.queue.push(socket.id)
+    console.log(this.queue)
+    socket.send('lobby')
 
     // we need to have a function that matches users they will be popped from the queue and get matched 2 at a time
 
@@ -41,28 +43,40 @@ export default class UserManager {
   }
 
   removeUser(socketId: string) {
-    this.users = this.users.filter((x) => x.socket.id === socketId)
+    // const user = this.users.find((x) => x.socket.id === socketId)
+    // if(!user)
+
+    this.users = this.users.filter((x) => x.socket.id !== socketId)
     this.queue = this.queue.filter((x) => x === socketId)
   }
 
   clearQueue() {
     if (this.queue.length < 2) return
+    const poppedUser1 = this.queue.pop()
+    const poppedUser2 = this.queue.pop()
 
-    const user1 = this.users.find((x) => x.socket.id === this.queue.pop())
-    const user2 = this.users.find((x) => x.socket.id === this.queue.pop())
+    // console.log(poppedUser1, poppedUser2)
+    const user1 = this.users.find((x) => x.socket.id === poppedUser1)
+    const user2 = this.users.find((x) => x.socket.id === poppedUser2)
+
+    // console.log(user1, user2)
 
     if (!user1 || !user2) {
       return
     }
-
-    const room = this.roomManager.createRoom(user1, user1)
+    // console.log(user1, user2)
+    const room = this.roomManager.createRoom(user1, user2)
+    this.clearQueue()
   }
 
   initHandlers(socket: Socket) {
+    console.log('recieved offer')
+
     socket.on('offer', ({ sdp, roomId }: { sdp: string; roomId: string }) => {
       this.roomManager.onOffer(roomId, sdp)
     })
     socket.on('answer', ({ sdp, roomId }: { sdp: string; roomId: string }) => {
+      console.log('recieved answer')
       this.roomManager.onAnswer(roomId, sdp)
     })
   }
