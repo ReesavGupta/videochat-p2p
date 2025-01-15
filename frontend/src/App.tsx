@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Landing } from './components/Landing'
-import { Room } from './components/Room'
 function App() {
   return (
     <BrowserRouter>
@@ -8,10 +7,6 @@ function App() {
         <Route
           path="/"
           element={<Landing />}
-        />
-        <Route
-          path="/room"
-          element={<Room />}
         />
       </Routes>
     </BrowserRouter>
